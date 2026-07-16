@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جواد للخدمات التسويقية - النظام المحاسبي</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/src/style.css">
+</head>
+<body class="flex flex-col md:flex-row min-h-screen text-slate-800">
+
+    <!-- Sidebar -->
+    <aside class="w-full md:w-80 bg-[#3b367d] text-white no-print flex flex-col shadow-2xl z-20 transition-all overflow-y-auto">
+        <div class="p-6 border-b border-white/5 text-center cursor-pointer" id="nav-dashboard">
+            <div class="flex items-center gap-3 mb-4 justify-center">
+                <img src="https://i.imgur.com/uiUY7ge.png" alt="جواد" class="w-12 h-12 object-contain">
+                <div class="flex flex-col text-right">
+                    <span class="text-xs font-bold text-[#c0a070] leading-tight">للخدمات التسويقية</span>
+                    <span class="text-[8px] font-light opacity-50 uppercase tracking-widest mt-1">Marketing Services</span>
+                </div>
+            </div>
+            <div class="text-[10px] bg-white/10 p-2 rounded text-center text-[#c0a070] font-bold italic hover:bg-white/20 transition">
+                نظام إدارة الحسابات المتكامل
+            </div>
+        </div>
+        <nav class="flex-1 p-4 space-y-3">
+            
+            <button id="nav-dashboard-btn" class="w-full flex items-center justify-start gap-3 px-4 py-3 rounded-xl bg-white/10 text-white font-bold hover:bg-white/20 transition shadow-sm text-sm border border-white/5">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                لوحة التحكم (الرئيسية)
+            </button>
+
+            <p class="text-[10px] text-white/40 uppercase font-bold px-2 mt-4">العمليات اليومية</p>
+            <button id="nav-new-invoice" class="w-full flex items-center justify-start gap-3 px-4 py-3 rounded-xl bg-[#c0a070] text-[#2a265a] font-bold hover:bg-white transition shadow-lg text-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                إصدار فاتورة جديدة
+            </button>
+            
+            <button id="nav-new-quote" class="w-full flex items-center justify-start gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-[#c0a070] hover:text-[#2a265a] hover:border-transparent transition shadow-sm text-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                عرض سعر جديد
+            </button>
+
+            <p class="text-[10px] text-white/40 uppercase font-bold px-2 mt-6">السجلات</p>
+            <button id="nav-customers" class="w-full flex items-center justify-start gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition shadow-sm text-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                قائمة العملاء
+            </button>
+
+            <button id="nav-archive" class="w-full flex items-center justify-start gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition shadow-sm text-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                أرشيف الفواتير وعروض الأسعار
+            </button>
+
+            <p class="text-[10px] text-white/40 uppercase font-bold px-2 mt-6">الإعدادات</p>
+            <button id="nav-admin" class="w-full flex items-center justify-start gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition shadow-sm text-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                إدارة النظام
+            </button>
+        </nav>
+        <div class="p-4 text-center text-[9px] text-white/20 border-t border-white/5">جواد للمحتوى &copy; 2026</div>
+    </aside>
+
+    <main class="flex-1 flex flex-col min-w-0 bg-[#f8fafc]">
+        
+        <!-- Header -->
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 no-print sticky top-0 z-10 shadow-sm shrink-0">
+            <div id="header-title" class="text-[#3b367d] font-bold text-sm">لوحة التحكم والمؤشرات</div>
+            <div id="header-actions" class="hidden flex gap-2">
+                <button id="savePrintBtn" class="px-8 py-2 bg-[#3b367d] text-white rounded-full text-sm font-bold shadow-lg hover:bg-[#2a265a] transition flex items-center gap-2">
+                    <span id="savePrintIcon" class="hidden"><div class="loader"></div></span>
+                    <span id="savePrintText">حفظ في السحابة وطباعة (PDF)</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- View: Dashboard -->
+        <div id="dashboard-view" class="p-8 space-y-8 flex-1 overflow-auto">
+            <!-- (Same as before) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Total Revenue -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-slate-500 font-bold mb-1">إجمالي الإيرادات</p>
+                        <h3 class="text-3xl font-black text-[#3b367d]" id="kpi-revenue">0.00 <span class="text-sm text-[#c0a070]">ر.س</span></h3>
+                    </div>
+                    <div class="w-12 h-12 bg-[#3b367d]/10 rounded-full flex items-center justify-center text-[#3b367d]">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                </div>
+                <!-- Unpaid Invoices -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-slate-500 font-bold mb-1">فواتير بانتظار الدفع</p>
+                        <h3 class="text-3xl font-black text-[#c0a070]" id="kpi-unpaid">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-[#c0a070]/10 rounded-full flex items-center justify-center text-[#c0a070]">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                </div>
+                <!-- Total Customers -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-slate-500 font-bold mb-1">إجمالي العملاء</p>
+                        <h3 class="text-3xl font-black text-slate-700" id="kpi-customers">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Revenue Over Time -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h4 class="text-[#3b367d] font-bold mb-4">الدخل الشهري</h4>
+                    <canvas id="revenueChart" height="250"></canvas>
+                </div>
+                <!-- Status Distribution -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h4 class="text-[#3b367d] font-bold mb-4">حالة الفواتير</h4>
+                    <canvas id="statusChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- View: Customers List -->
+        <div id="customers-view" class="hidden p-8 flex-1 overflow-auto">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                    <h2 class="font-bold text-[#3b367d]">قاعدة بيانات العملاء</h2>
+                    <button class="bg-[#c0a070] text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-[#b09060] transition" id="addCustomerBtn">+ عميل جديد</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-sm">
+                        <thead class="bg-slate-50 text-slate-500 font-bold">
+                            <tr>
+                                <th class="p-4">رقم العميل</th>
+                                <th class="p-4">الاسم</th>
+                                <th class="p-4">الهاتف</th>
+                                <th class="p-4">الرقم الضريبي</th>
+                                <th class="p-4">تاريخ الإضافة</th>
+                                <th class="p-4 text-center">إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersTableBody" class="divide-y divide-slate-100">
+                            <!-- Injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- View: Admin / System Settings -->
+        <div id="admin-view" class="hidden p-8 flex-1 overflow-auto">
+            <div class="max-w-2xl bg-white rounded-2xl shadow-sm border border-slate-100 p-8 mx-auto">
+                <h2 class="font-bold text-[#3b367d] text-xl mb-6 border-b pb-4">إعدادات النظام العامة</h2>
+                
+                <form id="settingsForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">اسم الشركة</label>
+                            <input type="text" id="set_company_name" class="w-full border border-slate-200 rounded-lg p-3 text-sm outline-none focus:border-[#c0a070] transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">نسبة الضريبة الافتراضية (%)</label>
+                            <input type="number" id="set_tax_rate" class="w-full border border-slate-200 rounded-lg p-3 text-sm outline-none focus:border-[#c0a070] transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">العملة الافتراضية</label>
+                            <select id="set_currency" class="w-full border border-slate-200 rounded-lg p-3 text-sm outline-none focus:border-[#c0a070] transition bg-white">
+                                <option value="SAR">ريال سعودي (SAR)</option>
+                                <option value="USD">دولار أمريكي (USD)</option>
+                                <option value="YER">ريال يمني (YER)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">العنوان</label>
+                            <input type="text" id="set_address" class="w-full border border-slate-200 rounded-lg p-3 text-sm outline-none focus:border-[#c0a070] transition">
+                        </div>
+                    </div>
+                    
+                    <div class="pt-6 border-t flex justify-end">
+                        <button type="submit" class="bg-[#3b367d] text-white px-8 py-2 rounded-lg font-bold shadow-md hover:bg-[#2a265a] transition flex items-center gap-2">
+                            <span id="settingsLoader" class="hidden"><div class="loader"></div></span>
+                            حفظ الإعدادات
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- View: Invoice Editor (Reused for Quotes too) -->
+        <div id="invoice-view" class="hidden preview-wrapper overflow-auto">
+            <div class="invoice-card" id="invoiceArea">
+                <!-- 1. Header Section -->
+                <div class="header-section flex justify-between items-start">
+                    <div class="flex items-center gap-6">
+                        <img src="https://i.imgur.com/CjzbUwV.png" alt="جواد" class="w-32 h-32 object-contain">
+                        <div class="flex flex-col border-r-2 border-[#c0a070]/30 pr-6">
+                            <div class="flex flex-col mb-4 text-right">
+                                <h2 class="text-2xl font-black text-[#c0a070] leading-tight" id="disp_company_name">للخدمات التسويقية</h2>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Marketing Services</p>
+                            </div>
+                            <div class="text-[11px] space-y-1.5 text-slate-600 border-t border-[#c0a070]/10 pt-3 text-right">
+                                <p class="font-bold text-[#3b367d]" id="disp_address">المملكة العربية السعودية - الرياض</p>
+                                <div class="flex items-center gap-4 font-mono text-[10px]">
+                                    <div class="flex items-center gap-1"><span contenteditable="true" id="vendorPhone1">+966554673697</span></div>
+                                    <div class="flex items-center gap-1"><span contenteditable="true" id="vendorPhone2">+967770822612</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-left w-1/3 flex flex-col items-end">
+                        <h1 class="text-6xl font-black text-[#3b367d] opacity-5 uppercase tracking-tighter mb-1" id="docTypeEn">INVOICE</h1>
+                        <div class="bg-[#f4f1eb] p-4 rounded-xl border-r-8 border-[#c0a070] shadow-sm w-full relative group">
+                            <p class="text-[9px] font-black text-[#c0a070] uppercase mb-1 text-right" id="docTypeAr">رقم الفاتورة</p>
+                            <p class="text-2xl font-mono font-bold text-[#3b367d] text-left" id="invoiceNumber">--</p>
+                        </div>
+                        <p class="text-[11px] font-bold text-slate-400 mt-4">تاريخ الإصدار: <span class="text-[#3b367d]" contenteditable="true" id="invoiceDate">--/--/----</span></p>
+                    </div>
+                </div>
+
+                <!-- 2. Customer Section -->
+                <div class="customer-section flex justify-between items-end mt-4">
+                    <div class="bg-slate-50 p-4 rounded-xl border-r-4 border-[#3b367d]/20 w-1/2 shadow-sm text-right relative group">
+                        <h3 class="text-[9px] font-black text-[#c0a070] uppercase mb-2 tracking-widest text-right">مقدمة إلى / Bill To:</h3>
+                        <p class="text-[9px] font-bold text-slate-400 mb-1 flex justify-between">
+                            <span>رقم العميل: <span class="font-mono text-[#3b367d] bg-white px-1 rounded cursor-pointer hover:bg-slate-200 transition" id="custId">C-0001</span></span>
+                            <button id="selectCustomerBtn" class="no-print bg-[#3b367d]/10 text-[#3b367d] px-2 py-0.5 rounded hover:bg-[#3b367d] hover:text-white transition">اختيار عميل</button>
+                        </p>
+                        <p class="text-xl font-bold text-[#3b367d]" contenteditable="true" id="custName">اسم العميل الموقر</p>
+                        <p class="text-[10px] text-slate-500" contenteditable="true" id="custAddress">أدخل عنوان العميل هنا...</p>
+                        <p class="text-[9px] font-bold pt-1">ضريبة العميل: <span class="font-mono text-[#3b367d]" contenteditable="true" id="custVat">300000000000003</span></p>
+                    </div>
+                    <div class="text-left flex flex-col items-end gap-2">
+                        <div class="flex items-center gap-2 mb-1 no-print">
+                            <label class="text-xs font-bold text-slate-400 cursor-pointer flex items-center gap-2">
+                                <input type="checkbox" id="taxToggle" checked class="accent-[#c0a070]">
+                                <span>تطبيق ضريبة (<span id="taxRateDisplay">15</span>%)</span>
+                            </label>
+                        </div>
+                        <select id="currencySelector" class="font-bold text-[#3b367d] bg-transparent outline-none currency-select text-sm no-print">
+                            <option value="SAR" selected>ريال سعودي (SAR)</option>
+                            <option value="USD">دولار أمريكي (USD)</option>
+                            <option value="YER">ريال يمني (YER)</option>
+                        </select>
+                        <span class="font-bold text-[#3b367d] hidden print:inline text-xs" id="printCurrency">ريال سعودي</span>
+                    </div>
+                </div>
+
+                <!-- 3. Items Section -->
+                <div class="items-section mt-4">
+                    <table class="w-full text-right" id="itemsTable">
+                        <thead>
+                            <tr class="bg-[#3b367d] text-white text-[10px] font-black uppercase tracking-widest">
+                                <th class="py-4 px-6 text-right rounded-tr-xl">الوصف / Description</th>
+                                <th class="py-4 px-2 text-center w-24">السعر</th>
+                                <th class="py-4 px-2 text-center w-16">الكمية</th>
+                                <th class="py-4 px-6 text-left w-36 rounded-tl-xl">المجموع</th>
+                                <th class="no-print w-10 bg-white border-none"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                    <button id="addRowBtn" class="no-print mt-4 flex items-center gap-2 px-4 py-1.5 bg-[#f4f1eb] text-[#3b367d] font-bold text-[10px] rounded-full hover:bg-[#c0a070] hover:text-white transition w-fit">
+                        <span>+</span> إضافة بند جديد
+                    </button>
+                </div>
+
+                <!-- 4. Footer Section -->
+                <div class="footer-section flex justify-between items-end gap-12">
+                    <div class="flex-1 space-y-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-24 h-24 bg-white border-2 border-[#c0a070] p-2 rounded-[2rem] shadow-sm flex items-center justify-center">
+                                <svg class="w-16 h-16 text-[#3b367d] opacity-20" fill="currentColor" viewBox="0 0 24 24"><path d="M3 3H9V9H3V3M5 5V7H7V5H5M15 3H21V9H15V3M17 5V7H19V5H17M3 15H9V21H3V15M5 17V19H7V17H5M15 15H17V17H15V15M19 19H21V21H19V19M17 17H19V19H17V17M19 17H21V19H19V17M17 19H19V21H17V19M13 3H14V4H13V3M13 5H14V6H13V5M13 7H14V8H13V7M13 9H14V10H13V9M13 11H14V12H13V11M13 13H14V14H13V13M13 15H14V16H13V15M13 17H14V18H13V17M13 19H14V20H13V19M13 21H14V22H13V21M3 11H4V12H3V11M5 11H6V12H5V11M7 11H8V12H7V11M9 11H10V12H9V11M11 11H12V12H11V11M11 3H12V4H11V3M11 5H12V6H11V5M11 7H12V8H11V7M11 9H12V10H11V9"/></svg>
+                            </div>
+                            <div class="text-[11px] text-slate-500 italic leading-relaxed bg-[#f4f1eb]/40 p-4 rounded-3xl border-r-4 border-[#c0a070] shadow-inner text-right" contenteditable="true" id="invoiceNotes">
+                                هذه الوثيقة صادرة إلكترونياً ولا تحتاج إلى ختم أو توقيع.
+                            </div>
+                        </div>
+                        <div class="text-[10px] text-slate-300 font-bold uppercase tracking-widest text-right">جواد للخدمات التسويقية - A4</div>
+                    </div>
+                    <div class="w-72 bg-[#3b367d] p-8 rounded-[2.5rem] text-white shadow-xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-[#c0a070] opacity-10 rounded-full -mr-16 -mt-16"></div>
+                        <div class="space-y-4 relative z-10 text-right">
+                            <div class="flex justify-between items-center text-[11px] opacity-70">
+                                <div class="flex items-center gap-1 font-mono"><span id="grandSubtotal">0.00</span><span class="footer-currency-symbol">ر.س</span></div>
+                                <span>المجموع الفرعي:</span>
+                            </div>
+                            <div class="flex justify-between items-center text-[11px] text-[#c0a070] font-bold">
+                                <div class="flex items-center gap-1 font-mono"><span id="grandTax">0.00</span><span class="footer-currency-symbol">ر.س</span></div>
+                                <span id="taxLabel">الضريبة (15%):</span>
+                            </div>
+                            <div class="pt-4 border-t border-white/20 flex justify-between items-end">
+                                <div class="text-left">
+                                    <span class="footer-currency-symbol text-[10px] font-bold text-[#c0a070] ml-1">ر.س</span>
+                                    <span class="text-4xl font-black font-mono tracking-tighter" id="grandTotal">0.00</span>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[9px] uppercase font-bold opacity-40 mb-1 tracking-widest">Total Due</p>
+                                    <p class="text-2xl font-black">الإجمالي</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Generic Modal for Archives / Customers List -->
+    <div id="genericModal" class="modal-overlay fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-5xl h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="bg-[#3b367d] p-4 text-white flex justify-between items-center flex-shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="bg-[#c0a070] p-1.5 rounded-lg text-[#3b367d]" id="modalIcon">
+                        <!-- Icon injected via JS -->
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-lg" id="modalTitle">العنوان</h2>
+                        <p class="text-xs text-white/60" id="modalSubtitle">وصف</p>
+                    </div>
+                </div>
+                <button id="closeModalBtn" class="p-2 hover:bg-white/10 rounded-full transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-auto bg-slate-50 p-6 relative">
+                <div id="modalLoader" class="hidden absolute inset-0 bg-white/80 z-10 flex flex-col items-center justify-center">
+                    <div class="loader w-10 h-10 border-4 border-[#c0a070] border-t-transparent"></div>
+                    <p class="mt-4 text-[#3b367d] font-bold text-sm">جاري الجلب...</p>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden" id="modalContent">
+                    <!-- Content injected via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Module Script -->
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+    --brand-primary: #3b367d; 
+    --brand-secondary: #c0a070; 
+    --brand-dark: #2a265a;
+    --brand-light: #f4f1eb;
+    --a4-width: 210mm;
+    --a4-height: 297mm;
+}
+
+body { 
+    font-family: 'Noto Sans Arabic', sans-serif; 
+    background-color: #cbd5e1; 
+    margin: 0; 
+    padding: 0; 
+    -webkit-print-color-adjust: exact; 
+    print-color-adjust: exact; 
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #c0a070; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #3b367d; }
+
+.loader { 
+    border: 2px solid #f3f3f3; 
+    border-radius: 50%; 
+    border-top: 2px solid var(--brand-secondary); 
+    width: 14px; 
+    height: 14px; 
+    animation: spin 1s linear infinite; 
+}
+
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* Invoice Specific Styles */
+.preview-wrapper { display: flex; justify-content: center; padding: 40px 0; min-height: 100vh; }
+.invoice-card { 
+    width: var(--a4-width); 
+    min-height: var(--a4-height); 
+    background-color: white; 
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15); 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: space-between; 
+    border-top: 12px solid var(--brand-primary); 
+    position: relative; 
+    overflow: hidden; 
+}
+
+[contenteditable="true"]:hover { 
+    outline: 1px dashed var(--brand-secondary); 
+    background-color: rgba(192, 160, 112, 0.05); 
+}
+
+.header-section { padding: 45px 50px 10px 50px; flex-shrink: 0; }
+.customer-section { padding: 10px 50px; flex-shrink: 0; }
+.items-section { padding: 10px 50px; flex-grow: 1; display: flex; flex-direction: column; }
+.footer-section { padding: 20px 50px 40px 50px; flex-shrink: 0; margin-top: auto; }
+
+.currency-select { 
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23c0a070'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); 
+    background-repeat: no-repeat; 
+    background-position: left 0.4rem center; 
+    background-size: 0.8rem; 
+    padding-left: 1.2rem; 
+}
+
+/* Print Styles */
+@page { size: A4; margin: 0; }
+@media print {
+    html, body { 
+        width: 210mm; 
+        height: 297mm; 
+        background-color: white !important; 
+        margin: 0 !important; 
+        padding: 0 !important; 
+        overflow: hidden !important; 
+    }
+    .no-print, aside, header, .modal-overlay, #dashboard-view { display: none !important; }
+    #invoice-view { display: block !important; }
+    .preview-wrapper { padding: 0 !important; display: block !important; height: 100% !important; }
+    .invoice-card { 
+        width: 100% !important; 
+        height: 100% !important; 
+        box-shadow: none !important; 
+        margin: 0 !important; 
+        border-top-width: 12px !important; 
+        print-color-adjust: exact; 
+    }
+    select { 
+        appearance: none; 
+        border: none; 
+        background: transparent; 
+        padding: 0; 
+        font-weight: bold; 
+        color: var(--brand-primary); 
+    }
+}
