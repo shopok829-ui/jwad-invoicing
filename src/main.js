@@ -3,8 +3,66 @@ import { initInvoice, saveDocument, printDocument, loadDocumentForEditing } from
 import { initCustomersView } from './customers.js';
 import { initAdminView, loadSystemSettings, systemSettingsCache } from './admin.js';
 import { supabase } from './supabase.js';
+import { initAuth, login, logout, currentUser } from './auth.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Auth Check
+    const isLoggedIn = await initAuth();
+    const loginView = document.getElementById('login-view');
+    const appContainer = document.getElementById('app-container');
+
+    if (!isLoggedIn) {
+        // Show Login
+        loginView.classList.remove('hidden');
+        appContainer.classList.add('hidden');
+        appContainer.classList.remove('flex'); // remove flex to completely hide
+
+        // Bind login button
+        document.getElementById('loginBtn').addEventListener('click', async () => {
+            const pwd = document.getElementById('loginPassword').value;
+            const errP = document.getElementById('loginError');
+            if(!pwd) { errP.innerText = 'الرجاء إدخال كلمة المرور'; errP.classList.remove('hidden'); return; }
+            
+            const btn = document.getElementById('loginBtn');
+            btn.innerHTML = 'جاري التحقق...';
+            btn.disabled = true;
+
+            const res = await login(pwd);
+            if(res.success) {
+                window.location.reload();
+            } else {
+                errP.innerText = res.message;
+                errP.classList.remove('hidden');
+                btn.innerHTML = `دخول <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>`;
+                btn.disabled = false;
+            }
+        });
+        
+        // Enter key to login
+        document.getElementById('loginPassword').addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') document.getElementById('loginBtn').click();
+        });
+
+        return; // Halt further app initialization
+    }
+
+    // User is logged in
+    loginView.classList.add('hidden');
+    appContainer.classList.remove('hidden');
+    appContainer.classList.add('flex'); // restore flex display
+    
+    // Set user info in sidebar
+    document.getElementById('currentUserLabel').innerText = currentUser.name || 'مستخدم';
+    document.getElementById('currentUserRole').innerText = currentUser.role === 'super_admin' ? 'سوبر أدمن' : 'مستخدم';
+    
+    // Bind logout
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    // Hide Admin nav if not super_admin
+    if(currentUser.role !== 'super_admin') {
+        document.getElementById('nav-admin').classList.add('hidden');
+    }
+
     // Load Settings First
     await loadSystemSettings();
 

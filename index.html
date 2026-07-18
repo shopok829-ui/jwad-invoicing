@@ -8,7 +8,27 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="./src/style.css">
 </head>
-<body class="flex flex-col md:flex-row min-h-screen text-slate-800">
+<body class="bg-slate-50 text-slate-800">
+
+    <!-- Login View -->
+    <div id="login-view" class="fixed inset-0 bg-[#3b367d] flex items-center justify-center z-50">
+        <div class="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-sm text-center mx-4">
+            <img src="https://i.imgur.com/uiUY7ge.png" alt="جواد" class="w-20 mx-auto mb-6">
+            <h2 class="text-2xl font-bold text-[#3b367d] mb-2">تسجيل الدخول</h2>
+            <p class="text-slate-500 text-sm mb-6">أدخل رمز المرور للوصول إلى النظام</p>
+            
+            <input type="password" id="loginPassword" placeholder="كلمة المرور..." class="w-full border-2 border-slate-200 rounded-xl p-4 text-center text-xl tracking-[0.2em] font-mono outline-none focus:border-[#c0a070] mb-4 transition">
+            <p id="loginError" class="text-red-500 text-sm mb-4 hidden"></p>
+            
+            <button id="loginBtn" class="w-full bg-[#c0a070] text-[#2a265a] font-bold py-4 rounded-xl hover:bg-[#a08050] hover:text-white transition shadow-lg flex justify-center items-center gap-2">
+                دخول
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app-container" class="hidden flex-col md:flex-row min-h-screen">
 
     <!-- Sidebar -->
     <aside class="w-full md:w-80 bg-[#3b367d] text-white no-print flex flex-col shadow-2xl z-20 transition-all overflow-y-auto">
@@ -59,7 +79,22 @@
                 إدارة النظام
             </button>
         </nav>
-        <div class="p-4 text-center text-[9px] text-white/20 border-t border-white/5">جواد للمحتوى &copy; 2026</div>
+        
+        <div class="p-4 mt-auto">
+            <div class="bg-white/10 p-4 rounded-xl text-xs space-y-2 mb-4">
+                <p class="flex justify-between text-white/70"><span>مرحباً:</span> <span id="currentUserLabel" class="font-bold text-[#c0a070]">--</span></p>
+                <p class="flex justify-between text-white/70"><span>الصلاحية:</span> <span id="currentUserRole" class="font-bold text-white">--</span></p>
+            </div>
+            <button id="logoutBtn" class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-red-500/20 text-red-300 font-bold hover:bg-red-500 hover:text-white transition text-xs border border-red-500/30">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                تسجيل الخروج
+            </button>
+        </div>
+        
+        <div class="p-4 text-center text-[10px] text-white/30 border-t border-white/5">
+            <p>© 2026 Jawad Marketing Services</p>
+            <p>v1.3.0</p>
+        </div>
     </aside>
 
     <main class="flex-1 flex flex-col min-w-0 bg-[#f8fafc]">
@@ -223,6 +258,59 @@
                         </button>
                     </div>
                 </form>
+        </div>
+            
+            <!-- Users Management Section -->
+            <div id="users-management-section" class="max-w-2xl bg-white rounded-2xl shadow-sm border border-slate-100 p-8 mx-auto mt-8 hidden">
+                <div class="flex justify-between items-center border-b pb-4 mb-6">
+                    <h2 class="font-bold text-[#3b367d] text-xl">إدارة المستخدمين والصلاحيات</h2>
+                    <button id="showAddUserModal" class="bg-[#c0a070] text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-[#b09060] transition">+ مستخدم جديد</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-sm">
+                        <thead class="bg-slate-50 text-slate-500 font-bold">
+                            <tr>
+                                <th class="p-4">الاسم</th>
+                                <th class="p-4">رمز الدخول</th>
+                                <th class="p-4">الصلاحية</th>
+                                <th class="p-4 text-center">إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody" class="divide-y divide-slate-100">
+                            <!-- Injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- User Form Modal -->
+        <div id="userModal" class="fixed inset-0 bg-[#3b367d]/40 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+            <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl relative flex flex-col p-8">
+                <h3 class="text-xl font-bold text-[#3b367d] mb-6" id="userModalTitle">إضافة مستخدم جديد</h3>
+                <form id="userForm" class="space-y-4">
+                    <input type="hidden" id="editUserId">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">اسم المستخدم</label>
+                        <input type="text" id="u_name" required class="w-full border border-slate-200 rounded-lg p-3 text-sm outline-none focus:border-[#c0a070]">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">رمز الدخول (كلمة المرور)</label>
+                        <input type="text" id="u_password" required class="w-full border border-slate-200 rounded-lg p-3 text-sm outline-none focus:border-[#c0a070] font-mono tracking-widest">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">الصلاحية</label>
+                        <select id="u_role" class="w-full border border-slate-200 rounded-lg p-3 text-sm outline-none focus:border-[#c0a070] bg-white">
+                            <option value="user">مستخدم عادي</option>
+                            <option value="super_admin">سوبر أدمن</option>
+                        </select>
+                    </div>
+                    <div class="pt-4 border-t mt-6 flex justify-end gap-2">
+                        <button type="button" onclick="document.getElementById('userModal').classList.add('hidden')" class="px-6 py-2 rounded-lg text-slate-500 font-bold hover:bg-slate-100 transition">إلغاء</button>
+                        <button type="submit" class="bg-[#c0a070] text-[#2a265a] px-6 py-2 rounded-lg font-bold shadow-md hover:bg-[#a08050] hover:text-white transition">حفظ</button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -376,6 +464,8 @@
             </div>
         </div>
     </div>
+
+    </div> <!-- End Main App -->
 
     <!-- Main Module Script -->
     <script type="module" src="./src/main.js"></script>
