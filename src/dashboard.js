@@ -6,12 +6,43 @@ let statusChartInstance = null;
 
 export async function initDashboard() {
     try {
-        // Fetch KPIs
-        const { data: invoices, error: invError } = await supabase.from('invoices').select('*');
-        const { data: customers, error: custError } = await supabase.from('customers').select('id');
-        
+        // Populate Customer Dropdown if empty
+        const custDropdown = document.getElementById('dashFilterCustomer');
+        if (custDropdown.options.length <= 1) {
+            const { data: allCustomers } = await supabase.from('customers').select('id, name');
+            if (allCustomers) {
+                allCustomers.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.innerText = c.name;
+                    custDropdown.appendChild(opt);
+                });
+            }
+            
+            // Bind filter button
+            document.getElementById('applyDashFilterBtn').onclick = applyDashboardFilters;
+        }
+
+        applyDashboardFilters();
+
+    } catch (err) {
+        console.error('Error init dashboard:', err);
+    }
+}
+
+async function applyDashboardFilters() {
+    const custId = document.getElementById('dashFilterCustomer').value;
+    const start = document.getElementById('dashFilterStart').value;
+    const end = document.getElementById('dashFilterEnd').value;
+
+    try {
+        let query = supabase.from('invoices').select('*');
+        if (custId !== 'all') query = query.eq('customer_id', custId);
+        if (start) query = query.gte('date', start);
+        if (end) query = query.lte('date', end);
+
+        const { data: invoices, error: invError } = await query;
         if (invError) throw invError;
-        if (custError) throw custError;
 
         let totalRevenue = 0;
         let unpaidCount = 0;
@@ -39,14 +70,21 @@ export async function initDashboard() {
         // Update KPI UI
         document.getElementById('kpi-revenue').innerHTML = `${totalRevenue.toLocaleString('en-US', {minimumFractionDigits: 2})} <span class="text-sm text-[#c0a070]">ر.س</span>`;
         document.getElementById('kpi-unpaid').innerText = unpaidCount;
-        document.getElementById('kpi-customers').innerText = customers.length;
+
+        // Count unique customers from filtered invoices, or total customers
+        if (custId !== 'all') {
+            document.getElementById('kpi-customers').innerText = '1';
+        } else {
+            const { count } = await supabase.from('customers').select('id', { count: 'exact' });
+            document.getElementById('kpi-customers').innerText = count || 0;
+        }
 
         // Render Charts
         renderRevenueChart(monthlyRevenue);
         renderStatusChart(statusCounts);
 
     } catch (err) {
-        console.error('Error loading dashboard data:', err);
+        console.error('Error applying filters:', err);
     }
 }
 

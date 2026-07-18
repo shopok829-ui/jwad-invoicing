@@ -8,10 +8,14 @@ const currencyData = {
 
 let currentDocType = 'invoice'; // 'invoice' or 'quote'
 let systemSettings = {};
+let isEditMode = false;
+let currentDocId = null;
 
 export function initInvoice(type = 'invoice', settings = {}) {
     currentDocType = type;
     systemSettings = settings;
+    isEditMode = false;
+    currentDocId = null;
     
     // Update UI text based on type
     document.getElementById('docTypeEn').innerText = type === 'invoice' ? 'INVOICE' : 'QUOTATION';
@@ -33,7 +37,7 @@ export function initInvoice(type = 'invoice', settings = {}) {
     const oldBtn = document.getElementById('addRowBtn');
     const newBtn = oldBtn.cloneNode(true);
     oldBtn.parentNode.replaceChild(newBtn, oldBtn);
-    newBtn.addEventListener('click', addRow);
+    newBtn.addEventListener('click', () => addRow());
     
     document.getElementById('taxToggle').addEventListener('change', calculateAll);
     document.getElementById('currencySelector').addEventListener('change', calculateAll);
@@ -42,6 +46,59 @@ export function initInvoice(type = 'invoice', settings = {}) {
     const newSelectBtn = oldSelectBtn.cloneNode(true);
     oldSelectBtn.parentNode.replaceChild(newSelectBtn, oldSelectBtn);
     newSelectBtn.addEventListener('click', openCustomerSelector);
+}
+
+export async function loadDocumentForEditing(docId, type, settings = {}) {
+    currentDocType = type;
+    systemSettings = settings;
+    isEditMode = true;
+    currentDocId = docId;
+
+    document.getElementById('docTypeEn').innerText = type === 'invoice' ? 'INVOICE' : 'QUOTATION';
+    document.getElementById('docTypeAr').innerText = type === 'invoice' ? 'رقم الفاتورة' : 'رقم عرض السعر';
+
+    if(settings.company_name) document.getElementById('disp_company_name').innerText = settings.company_name;
+    if(settings.address) document.getElementById('disp_address').innerText = settings.address;
+    if(settings.tax_rate) document.getElementById('taxRateDisplay').innerText = settings.tax_rate;
+
+    const table = type === 'invoice' ? 'invoices' : 'quotes';
+    const itemsTable = type === 'invoice' ? 'invoice_items' : 'quote_items';
+    const docField = type === 'invoice' ? 'invoice_id' : 'quote_id';
+
+    try {
+        const { data: doc, error: docErr } = await supabase.from(table).select('*, customers(*)').eq('id', docId).single();
+        if (docErr) throw docErr;
+
+        const { data: items, error: itemsErr } = await supabase.from(itemsTable).select('*').eq(docField, docId);
+        if (itemsErr) throw itemsErr;
+
+        document.getElementById('invoiceDate').innerText = doc.date.split('-').reverse().join('/'); 
+        document.getElementById('invoiceNumber').innerText = doc.invoice_number || doc.quote_number;
+        document.getElementById('invoiceNotes').innerText = doc.notes || '';
+        document.getElementById('currencySelector').value = doc.currency || 'SAR';
+        document.getElementById('taxToggle').checked = doc.tax > 0;
+
+        if (doc.customers) {
+            document.getElementById('custId').innerText = doc.customers.customer_number;
+            document.getElementById('custName').innerText = doc.customers.name;
+            document.getElementById('custAddress').innerText = doc.customers.address || 'لا يوجد عنوان';
+            document.getElementById('custVat').innerText = doc.customers.vat_number || 'لا يوجد';
+        }
+
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        if (items && items.length > 0) {
+            items.forEach(item => addRow(item));
+        } else {
+            addRow();
+        }
+
+        calculateAll();
+
+    } catch (err) {
+        console.error('Error loading doc for edit', err);
+        alert('حدث خطأ أثناء تحميل المستند للتعديل');
+    }
 }
 
 export function resetForm() {
@@ -57,20 +114,26 @@ export function resetForm() {
     calculateAll();
 }
 
-function addRow() {
+function addRow(item = null) {
     const tbody = document.getElementById('tableBody');
     const tr = document.createElement('tr');
     tr.className = 'item-row border-b border-slate-100 group transition hover:bg-brand-light/30';
+    
+    const desc = item ? item.description : 'وصف الخدمة';
+    const details = item ? item.details : 'اضف التفاصيل هنا...';
+    const price = item ? item.price : 0.00;
+    const qty = item ? item.quantity : 1;
+
     tr.innerHTML = `
         <td class="py-5 px-6 text-right">
-            <div class="font-bold text-[#3b367d] text-sm item-desc" contenteditable="true">وصف الخدمة</div>
-            <div class="text-[9px] text-slate-400 item-details" contenteditable="true">اضف التفاصيل هنا...</div>
+            <div class="font-bold text-[#3b367d] text-sm item-desc" contenteditable="true">${desc}</div>
+            <div class="text-[9px] text-slate-400 item-details" contenteditable="true">${details}</div>
         </td>
         <td class="py-5 px-2 text-center">
-            <input type="number" step="0.01" value="0.00" class="w-full text-center bg-transparent outline-none item-price text-sm">
+            <input type="number" step="0.01" value="${price}" class="w-full text-center bg-transparent outline-none item-price text-sm">
         </td>
         <td class="py-5 px-2 text-center">
-            <input type="number" step="1" value="1" class="w-full text-center bg-[#f4f1eb] rounded font-bold text-[#3b367d] item-qty outline-none text-sm">
+            <input type="number" step="1" value="${qty}" class="w-full text-center bg-[#f4f1eb] rounded font-bold text-[#3b367d] item-qty outline-none text-sm">
         </td>
         <td class="py-5 px-6 text-left font-black text-[#3b367d] text-sm text-left">
             <span class="row-total">0.00</span>
@@ -122,13 +185,21 @@ function calculateAll() {
     document.getElementById('grandTotal').innerText = format(grandTotal);
 }
 
-export async function saveDocumentAndPrint() {
-    const btn = document.getElementById('savePrintBtn');
-    const icon = document.getElementById('savePrintIcon');
-    const text = document.getElementById('savePrintText');
+export function printDocument() {
+    const docNum = document.getElementById('invoiceNumber').innerText.trim();
+    const custName = document.getElementById('custName').innerText.trim();
+    const originalDocTitle = document.title;
+    document.title = `${custName} - ${docNum}`;
+    window.print();
+    document.title = originalDocTitle;
+}
+
+export async function saveDocument() {
+    const btn = document.getElementById('saveBtn');
+    const icon = document.getElementById('saveIcon');
+    const text = document.getElementById('saveText');
     const custName = document.getElementById('custName').innerText.trim();
     const docNum = document.getElementById('invoiceNumber').innerText.trim();
-    const originalDocTitle = document.title;
 
     btn.disabled = true; 
     icon.classList.remove('hidden'); 
@@ -147,7 +218,6 @@ export async function saveDocumentAndPrint() {
 
         if (existingCust) {
             customerId = existingCust.id;
-            // Update customer details just in case
             await supabase.from('customers').update({
                 name: custName,
                 address: document.getElementById('custAddress').innerText.trim(),
@@ -179,26 +249,45 @@ export async function saveDocumentAndPrint() {
         let isoDate = new Date().toISOString().split('T')[0];
         if (dateParts.length === 3) isoDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
 
-        // 3. Save Document
-        let docId;
-        if (currentDocType === 'invoice') {
-            const { data: doc, error } = await supabase.from('invoices').insert([{
-                customer_id: customerId, invoice_number: docNum, date: isoDate,
-                currency: document.getElementById('currencySelector').value,
-                subtotal: subtotal, tax: tax, total: total, status: 'draft',
-                notes: document.getElementById('invoiceNotes').innerText.trim()
-            }]).select().single();
-            if (error) throw error;
-            docId = doc.id;
+        // 3. Save Document (Insert or Update)
+        let docId = currentDocId;
+        const docData = {
+            customer_id: customerId, date: isoDate,
+            currency: document.getElementById('currencySelector').value,
+            subtotal: subtotal, tax: tax, total: total, status: 'draft',
+            notes: document.getElementById('invoiceNotes').innerText.trim()
+        };
+
+        if (currentDocType === 'invoice') docData.invoice_number = docNum;
+        else docData.quote_number = docNum;
+
+        const table = currentDocType === 'invoice' ? 'invoices' : 'quotes';
+        const itemsTable = currentDocType === 'invoice' ? 'invoice_items' : 'quote_items';
+        const docField = currentDocType === 'invoice' ? 'invoice_id' : 'quote_id';
+
+        if (isEditMode && currentDocId) {
+            // UPDATE
+            const { error: updErr } = await supabase.from(table).update(docData).eq('id', currentDocId);
+            if (updErr) throw updErr;
+
+            // Delete old items
+            await supabase.from(itemsTable).delete().eq(docField, currentDocId);
+
+            if (currentDocType === 'invoice') {
+                const { data: oldJe } = await supabase.from('journal_entries').select('id').eq('reference_id', currentDocId).eq('reference_type', 'invoice');
+                if (oldJe && oldJe.length > 0) {
+                    const jeIds = oldJe.map(j => j.id);
+                    await supabase.from('journal_lines').delete().in('entry_id', jeIds);
+                    await supabase.from('journal_entries').delete().in('id', jeIds);
+                }
+            }
         } else {
-            const { data: doc, error } = await supabase.from('quotes').insert([{
-                customer_id: customerId, quote_number: docNum, date: isoDate,
-                currency: document.getElementById('currencySelector').value,
-                subtotal: subtotal, tax: tax, total: total, status: 'draft',
-                notes: document.getElementById('invoiceNotes').innerText.trim()
-            }]).select().single();
+            // INSERT
+            const { data: doc, error } = await supabase.from(table).insert([docData]).select().single();
             if (error) throw error;
             docId = doc.id;
+            currentDocId = docId;
+            isEditMode = true; // Switch to edit mode after first save
         }
 
         // 4. Insert Items
@@ -217,8 +306,7 @@ export async function saveDocumentAndPrint() {
         });
         
         if (itemsToInsert.length > 0) {
-            const table = currentDocType === 'invoice' ? 'invoice_items' : 'quote_items';
-            const { error: itemsErr } = await supabase.from(table).insert(itemsToInsert);
+            const { error: itemsErr } = await supabase.from(itemsTable).insert(itemsToInsert);
             if (itemsErr) throw itemsErr;
         }
 
@@ -245,22 +333,17 @@ export async function saveDocumentAndPrint() {
             if (jlErr) throw jlErr;
         }
 
-        // 6. Print
-        document.title = `${custName} - ${docNum}`;
-        setTimeout(() => {
-            window.print();
-            document.title = originalDocTitle;
-            btn.disabled = false; 
-            icon.classList.add('hidden'); 
-            text.innerText = 'حفظ في السحابة وطباعة (PDF)';
-        }, 500);
+        btn.disabled = false; 
+        icon.classList.add('hidden'); 
+        text.innerText = 'تم الحفظ بنجاح ✓';
+        setTimeout(() => text.innerText = 'حفظ المستند', 3000);
 
     } catch (error) {
         console.error('Save error:', error);
         alert('حدث خطأ أثناء الحفظ. تأكد من أن رقم المستند غير مكرر.');
         btn.disabled = false; 
         icon.classList.add('hidden'); 
-        text.innerText = 'حفظ في السحابة وطباعة (PDF)';
+        text.innerText = 'حفظ المستند';
     }
 }
 
@@ -307,7 +390,6 @@ async function openCustomerSelector() {
         html += `</div></div>`;
         content.innerHTML = html;
 
-        // Bind clicks
         document.getElementById('modalAddCustBtn').onclick = () => {
             modal.classList.add('hidden');
             document.getElementById('nav-customers').click();
