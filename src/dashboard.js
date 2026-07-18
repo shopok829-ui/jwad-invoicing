@@ -52,10 +52,7 @@ async function applyDashboardFilters() {
         invoices.forEach(inv => {
             totalRevenue += parseFloat(inv.total || 0);
             
-            if (inv.status === 'draft' || inv.status === 'sent') {
-                unpaidCount++;
-            }
-
+            unpaidCount++; // Now represents total invoices
             // Map status
             if(inv.status === 'paid') statusCounts['مدفوعة']++;
             else if(inv.status === 'sent') statusCounts['بانتظار الدفع']++;
