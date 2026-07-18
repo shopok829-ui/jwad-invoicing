@@ -37,6 +37,11 @@ export function initInvoice(type = 'invoice', settings = {}) {
     
     document.getElementById('taxToggle').addEventListener('change', calculateAll);
     document.getElementById('currencySelector').addEventListener('change', calculateAll);
+
+    const oldSelectBtn = document.getElementById('selectCustomerBtn');
+    const newSelectBtn = oldSelectBtn.cloneNode(true);
+    oldSelectBtn.parentNode.replaceChild(newSelectBtn, oldSelectBtn);
+    newSelectBtn.addEventListener('click', openCustomerSelector);
 }
 
 export function resetForm() {
@@ -256,5 +261,72 @@ export async function saveDocumentAndPrint() {
         btn.disabled = false; 
         icon.classList.add('hidden'); 
         text.innerText = 'حفظ في السحابة وطباعة (PDF)';
+    }
+}
+
+async function openCustomerSelector() {
+    const modal = document.getElementById('genericModal');
+    document.getElementById('modalTitle').innerText = 'اختيار عميل';
+    document.getElementById('modalSubtitle').innerText = 'اختر عميلاً من القائمة أو أضف عميلاً جديداً';
+    document.getElementById('modalIcon').innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>`;
+    
+    modal.classList.remove('hidden');
+    document.getElementById('modalLoader').classList.remove('hidden');
+    const content = document.getElementById('modalContent');
+    content.innerHTML = '';
+
+    try {
+        const { data: customers, error } = await supabase
+            .from('customers')
+            .select('*')
+            .order('name', { ascending: true });
+
+        if (error) throw error;
+        document.getElementById('modalLoader').classList.add('hidden');
+
+        let html = `
+            <div class="p-6">
+                <button id="modalAddCustBtn" class="w-full bg-[#f4f1eb] text-[#3b367d] border-2 border-dashed border-[#c0a070] py-3 rounded-xl font-bold mb-4 hover:bg-[#c0a070] hover:text-white transition">+ إضافة عميل جديد سريع</button>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        `;
+
+        if(customers.length === 0) {
+            html += `<p class="col-span-full text-center text-slate-400 p-4">لا يوجد عملاء، أضف عميلاً جديداً</p>`;
+        } else {
+            customers.forEach(c => {
+                html += `
+                    <div class="cust-card bg-white border border-slate-200 p-4 rounded-xl cursor-pointer hover:border-[#c0a070] hover:shadow-md transition text-right" data-id="${c.customer_number}" data-name="${c.name}" data-vat="${c.vat_number || 'لا يوجد'}" data-addr="${c.address || 'لا يوجد عنوان'}">
+                        <p class="font-bold text-[#3b367d] mb-1">${c.name}</p>
+                        <p class="text-xs text-slate-500 font-mono mb-2">${c.customer_number}</p>
+                        <p class="text-xs text-slate-400">الضريبي: <span class="font-mono">${c.vat_number || '--'}</span></p>
+                    </div>
+                `;
+            });
+        }
+        
+        html += `</div></div>`;
+        content.innerHTML = html;
+
+        // Bind clicks
+        document.getElementById('modalAddCustBtn').onclick = () => {
+            modal.classList.add('hidden');
+            document.getElementById('nav-customers').click();
+            setTimeout(() => document.getElementById('addCustomerBtn').click(), 100);
+        };
+
+        document.querySelectorAll('.cust-card').forEach(card => {
+            card.onclick = () => {
+                document.getElementById('custId').innerText = card.dataset.id;
+                document.getElementById('custName').innerText = card.dataset.name;
+                document.getElementById('custVat').innerText = card.dataset.vat;
+                document.getElementById('custAddress').innerText = card.dataset.addr;
+                modal.classList.add('hidden');
+            };
+        });
+
+    } catch (err) {
+        console.error(err);
+        document.getElementById('modalLoader').classList.add('hidden');
+        content.innerHTML = '<p class="p-8 text-center text-red-500">حدث خطأ أثناء جلب العملاء</p>';
     }
 }
