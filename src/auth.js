@@ -22,7 +22,10 @@ export async function login(password) {
             .eq('password', password)
             .single();
 
-        if (error || !data) {
+        if (error) {
+            return { success: false, message: 'خطأ تقني: ' + error.message };
+        }
+        if (!data) {
             return { success: false, message: 'كلمة المرور غير صحيحة' };
         }
 
