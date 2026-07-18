@@ -117,3 +117,77 @@ async function openCustomerStatement(customer) {
         content.innerHTML = '<p class="p-8 text-center text-red-500">حدث خطأ أثناء جلب كشف الحساب</p>';
     }
 }
+
+document.getElementById('addCustomerBtn').onclick = openAddCustomerModal;
+
+function openAddCustomerModal() {
+    const modal = document.getElementById('genericModal');
+    document.getElementById('modalTitle').innerText = 'إضافة عميل جديد';
+    document.getElementById('modalSubtitle').innerText = 'أدخل تفاصيل العميل ليتم حفظها في قاعدة البيانات';
+    document.getElementById('modalIcon').innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>`;
+    
+    modal.classList.remove('hidden');
+    document.getElementById('modalLoader').classList.add('hidden');
+    const content = document.getElementById('modalContent');
+    
+    content.innerHTML = `
+        <form id="addCustomerForm" class="p-6 space-y-4 text-right" dir="rtl">
+            <div>
+                <label class="block text-sm font-bold text-[#3b367d] mb-1">اسم العميل أو الشركة *</label>
+                <input type="text" id="newCustName" required class="w-full border border-slate-200 rounded p-2 text-sm outline-none focus:border-[#c0a070]">
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-[#3b367d] mb-1">الهاتف</label>
+                <input type="text" id="newCustPhone" class="w-full border border-slate-200 rounded p-2 text-sm outline-none focus:border-[#c0a070]" dir="ltr">
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-[#3b367d] mb-1">الرقم الضريبي</label>
+                <input type="text" id="newCustVat" class="w-full border border-slate-200 rounded p-2 text-sm outline-none focus:border-[#c0a070]" dir="ltr">
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-[#3b367d] mb-1">العنوان</label>
+                <input type="text" id="newCustAddress" class="w-full border border-slate-200 rounded p-2 text-sm outline-none focus:border-[#c0a070]">
+            </div>
+            <div class="pt-4 flex justify-end">
+                <button type="submit" class="bg-[#3b367d] text-white px-6 py-2 rounded font-bold hover:bg-[#2a265a] transition flex items-center gap-2">
+                    <span id="saveCustLoader" class="hidden">...</span>
+                    حفظ العميل
+                </button>
+            </div>
+        </form>
+    `;
+
+    document.getElementById('addCustomerForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const btnLoader = document.getElementById('saveCustLoader');
+        btnLoader.classList.remove('hidden');
+        
+        const name = document.getElementById('newCustName').value.trim();
+        const phone = document.getElementById('newCustPhone').value.trim();
+        const vat = document.getElementById('newCustVat').value.trim();
+        const address = document.getElementById('newCustAddress').value.trim();
+
+        const customer_number = 'C-' + Math.floor(1000 + Math.random() * 9000);
+
+        try {
+            const { error } = await supabase.from('customers').insert([{
+                name,
+                phone,
+                vat_number: vat,
+                address,
+                customer_number
+            }]);
+
+            if (error) throw error;
+            
+            modal.classList.add('hidden');
+            initCustomersView(); 
+            
+        } catch (err) {
+            console.error(err);
+            alert('حدث خطأ أثناء حفظ العميل.');
+        } finally {
+            btnLoader.classList.add('hidden');
+        }
+    };
+}
