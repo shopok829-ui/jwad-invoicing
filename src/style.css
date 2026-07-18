@@ -36,10 +36,14 @@ body {
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
 /* Invoice Specific Styles */
-.preview-wrapper { display: flex; justify-content: center; padding: 40px 0; min-height: 100vh; }
+.preview-wrapper { display: flex; padding: 20px 10px; min-height: 100vh; overflow-x: auto; }
+@media (min-width: 768px) {
+    .preview-wrapper { justify-content: center; padding: 40px 0; }
+}
 .invoice-card { 
     width: var(--a4-width); 
-    min-height: var(--a4-height); 
+    min-width: var(--a4-width); /* force width */
+    min-height: var(--a4-height);
     background-color: white; 
     box-shadow: 0 20px 50px rgba(0,0,0,0.15); 
     display: flex; 

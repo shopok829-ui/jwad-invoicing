@@ -97,44 +97,71 @@ document.addEventListener('DOMContentLoaded', async () => {
         headerActions.classList.add('hidden');
     }
 
+    // Mobile Sidebar Logic
+    const sidebar = document.getElementById('sidebar');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+
+    function toggleSidebar() {
+        if (sidebar) sidebar.classList.toggle('translate-x-full');
+        if (mobileOverlay) mobileOverlay.classList.toggle('hidden');
+    }
+
+    function closeSidebarOnMobile() {
+        if (sidebar && !sidebar.classList.contains('translate-x-full') && window.innerWidth < 768) {
+            toggleSidebar();
+        }
+    }
+
+    if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
+    if (mobileOverlay) mobileOverlay.addEventListener('click', toggleSidebar);
+    if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', toggleSidebar);
+
+    // Navigation Wrappers to auto-close sidebar on mobile
+    function navigateTo(action) {
+        action();
+        closeSidebarOnMobile();
+    }
+
     // Initialize Dashboard as default
     switchToDashboard();
 
     // Event Listeners for Navigation
-    navDashboard.addEventListener('click', switchToDashboard);
-    if(navDashboardBtn) navDashboardBtn.addEventListener('click', switchToDashboard);
+    navDashboard.addEventListener('click', () => navigateTo(switchToDashboard));
+    if(navDashboardBtn) navDashboardBtn.addEventListener('click', () => navigateTo(switchToDashboard));
     
-    navNewInvoice.addEventListener('click', () => {
+    navNewInvoice.addEventListener('click', () => navigateTo(() => {
         hideAllViews();
         views.invoice.classList.remove('hidden');
         headerTitle.innerText = 'إصدار فاتورة جديدة';
         headerActions.classList.remove('hidden');
         initInvoice('invoice', systemSettingsCache);
-    });
+    }));
 
-    navNewQuote.addEventListener('click', () => {
+    navNewQuote.addEventListener('click', () => navigateTo(() => {
         hideAllViews();
         views.invoice.classList.remove('hidden');
         headerTitle.innerText = 'إصدار عرض سعر جديد';
         headerActions.classList.remove('hidden');
         initInvoice('quote', systemSettingsCache);
-    });
+    }));
 
-    navCustomers.addEventListener('click', () => {
+    navCustomers.addEventListener('click', () => navigateTo(() => {
         hideAllViews();
         views.customers.classList.remove('hidden');
         headerTitle.innerText = 'قاعدة بيانات العملاء';
         initCustomersView();
-    });
+    }));
 
-    navAdmin.addEventListener('click', () => {
+    navAdmin.addEventListener('click', () => navigateTo(() => {
         hideAllViews();
         views.admin.classList.remove('hidden');
         headerTitle.innerText = 'إدارة النظام';
         initAdminView();
-    });
+    }));
 
-    navArchive.addEventListener('click', openArchive);
+    navArchive.addEventListener('click', () => navigateTo(openArchive));
     closeModalBtn.addEventListener('click', () => genericModal.classList.add('hidden'));
 
     // Bind Save and Print for documents
