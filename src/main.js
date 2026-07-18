@@ -187,7 +187,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <td class="p-4 font-bold text-slate-700">${doc.customers?.name || '--'}</td>
                         <td class="p-4 text-center font-bold text-[#c0a070]">${parseFloat(doc.total).toLocaleString()}</td>
                         <td class="p-4 text-center">
-                            <button onclick="window.editDocument('${doc.id}', '${doc.docTypeRaw}')" class="bg-[#f4f1eb] text-[#3b367d] px-4 py-1 rounded text-xs font-bold hover:bg-[#c0a070] hover:text-white transition shadow-sm border border-[#c0a070]/30">تعديل</button>
+                            <button onclick="window.editDocument('${doc.id}', '${doc.docTypeRaw}')" class="bg-[#f4f1eb] text-[#3b367d] px-3 py-1 rounded text-xs font-bold hover:bg-[#c0a070] hover:text-white transition shadow-sm border border-[#c0a070]/30 ml-1">تعديل</button>
+                            <button onclick="window.deleteDocument('${doc.id}', '${doc.docTypeRaw}')" class="bg-red-50 text-red-600 px-3 py-1 rounded text-xs font-bold hover:bg-red-500 hover:text-white transition shadow-sm border border-red-200">حذف</button>
                         </td>
                     </tr>
                 `;
@@ -234,5 +235,47 @@ document.addEventListener('DOMContentLoaded', async () => {
         headerTitle.innerText = type === 'invoice' ? 'تعديل الفاتورة' : 'تعديل عرض السعر';
         headerActions.classList.remove('hidden');
         loadDocumentForEditing(docId, type, systemSettingsCache);
+    };
+
+    window.deleteDocument = async function(docId, type) {
+        if(!confirm('هل أنت متأكد من حذف هذا المستند؟ سيتم حذفه من النظام بشكل نهائي ولن يمكن التراجع.')) return;
+
+        const table = type === 'invoice' ? 'invoices' : 'quotes';
+        const itemsTable = type === 'invoice' ? 'invoice_items' : 'quote_items';
+        const docField = type === 'invoice' ? 'invoice_id' : 'quote_id';
+
+        try {
+            document.getElementById('modalLoader').classList.remove('hidden');
+            
+            // Delete items first
+            await supabase.from(itemsTable).delete().eq(docField, docId);
+
+            // If invoice, delete journal entries
+            if (type === 'invoice') {
+                const { data: oldJe } = await supabase.from('journal_entries').select('id').eq('reference_id', docId).eq('reference_type', 'invoice');
+                if (oldJe && oldJe.length > 0) {
+                    const jeIds = oldJe.map(j => j.id);
+                    await supabase.from('journal_lines').delete().in('entry_id', jeIds);
+                    await supabase.from('journal_entries').delete().in('id', jeIds);
+                }
+            }
+
+            // Finally, delete the document
+            const { error } = await supabase.from(table).delete().eq('id', docId);
+            if (error) throw error;
+
+            // Update local array
+            archiveDocs = archiveDocs.filter(d => d.id !== docId);
+            
+            // Re-render table
+            document.getElementById('modalLoader').classList.add('hidden');
+            const searchTerm = document.getElementById('archiveSearch')?.value || '';
+            renderArchiveTable(searchTerm, window.currentArchiveSortCol, window.currentArchiveSortAsc);
+
+        } catch (err) {
+            console.error('Delete error:', err);
+            document.getElementById('modalLoader').classList.add('hidden');
+            alert('حدث خطأ أثناء الحذف.');
+        }
     };
 });
